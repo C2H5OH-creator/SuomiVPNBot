@@ -63,22 +63,22 @@ fi
 
 # Обновляем pip в виртуальном окружении
 echo "📦 Обновляем pip в виртуальном окружении..."
-"$VIRTUAL_ENV/bin/pip" install --upgrade pip
+"$VIRTUAL_ENV/bin/python" -m pip install --upgrade pip
 
 # Устанавливаем зависимости в виртуальном окружении
 echo "📚 Устанавливаем зависимости в виртуальном окружении..."
-if ! "$VIRTUAL_ENV/bin/pip" install -r requirements.txt; then
+if ! "$VIRTUAL_ENV/bin/python" -m pip install -r requirements.txt; then
     echo "⚠️  Ошибка при установке зависимостей. Пробуем альтернативный способ..."
     
     # Устанавливаем зависимости по одной
     echo "📦 Устанавливаем aiogram..."
-    "$VIRTUAL_ENV/bin/pip" install aiogram
+    "$VIRTUAL_ENV/bin/python" -m pip install aiogram
     
     echo "📦 Устанавливаем aiosqlite..."
-    "$VIRTUAL_ENV/bin/pip" install aiosqlite
+    "$VIRTUAL_ENV/bin/python" -m pip install aiosqlite
     
     echo "📦 Устанавливаем python-dotenv..."
-    "$VIRTUAL_ENV/bin/pip" install python-dotenv
+    "$VIRTUAL_ENV/bin/python" -m pip install python-dotenv
     
     echo "✅ Зависимости установлены альтернативным способом"
 else
