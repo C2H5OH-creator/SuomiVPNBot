@@ -28,25 +28,41 @@ for pkg in python3-dev build-essential libssl-dev libffi-dev pkg-config gcc g++ 
     fi
 done
 
+# Получаем путь к виртуальному окружению
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VENV_PATH="$SCRIPT_DIR/venv"
+
+# Активируем виртуальное окружение
+if [ -d "$VENV_PATH" ]; then
+    echo "🔧 Активируем виртуальное окружение: $VENV_PATH"
+    source "$VENV_PATH/bin/activate"
+    export VIRTUAL_ENV="$VENV_PATH"
+    export PATH="$VENV_PATH/bin:$PATH"
+    unset PYTHONHOME
+else
+    echo "❌ Виртуальное окружение не найдено в $VENV_PATH"
+    exit 1
+fi
+
 # Пробуем установить каждую зависимость отдельно
-echo "📦 Тестируем установку зависимостей..."
+echo "📦 Тестируем установку зависимостей в виртуальном окружении..."
 
 echo "1. Устанавливаем aiogram..."
-if pip install aiogram; then
+if "$VENV_PATH/bin/pip" install aiogram; then
     echo "✅ aiogram установлен успешно"
 else
     echo "❌ Ошибка установки aiogram"
 fi
 
 echo "2. Устанавливаем aiosqlite..."
-if pip install aiosqlite; then
+if "$VENV_PATH/bin/pip" install aiosqlite; then
     echo "✅ aiosqlite установлен успешно"
 else
     echo "❌ Ошибка установки aiosqlite"
 fi
 
 echo "3. Устанавливаем python-dotenv..."
-if pip install python-dotenv; then
+if "$VENV_PATH/bin/pip" install python-dotenv; then
     echo "✅ python-dotenv установлен успешно"
 else
     echo "❌ Ошибка установки python-dotenv"
