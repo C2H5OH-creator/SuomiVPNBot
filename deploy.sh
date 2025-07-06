@@ -4,6 +4,10 @@
 
 echo "🚀 Начинаем деплой VPN бота..."
 
+# Получаем путь к директории скрипта
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+echo "📁 Директория проекта: $SCRIPT_DIR"
+
 # Проверяем наличие Python
 if ! command -v python3 &> /dev/null; then
     echo "❌ Python3 не найден. Устанавливаем..."
@@ -11,13 +15,19 @@ if ! command -v python3 &> /dev/null; then
     apt install -y python3 python3-pip python3-venv
 fi
 
-# Создаем директорию если её нет
-if [ ! -d "/root/VPNbot_dev" ]; then
-    echo "📁 Создаем директорию проекта..."
-    mkdir -p /root/VPNbot_dev
+# Переходим в директорию проекта
+cd "$SCRIPT_DIR"
+
+# Проверяем наличие необходимых файлов
+if [ ! -f "requirements.txt" ]; then
+    echo "❌ Файл requirements.txt не найден в $SCRIPT_DIR"
+    exit 1
 fi
 
-cd /root/VPNbot_dev
+if [ ! -f "main.py" ]; then
+    echo "❌ Файл main.py не найден в $SCRIPT_DIR"
+    exit 1
+fi
 
 # Создаем виртуальное окружение
 if [ ! -d "venv" ]; then
@@ -40,7 +50,7 @@ pip install -r requirements.txt
 # Проверяем наличие .env файла
 if [ ! -f ".env" ]; then
     echo "⚠️  Файл .env не найден!"
-    echo "📝 Создайте файл .env со следующим содержимым:"
+    echo "📝 Создайте файл .env в директории $SCRIPT_DIR со следующим содержимым:"
     echo "TELEGRAM_BOT_API_TOKEN=ваш_токен_бота"
     echo "ADMINS=[ваш_id_админа]"
     echo ""
@@ -53,8 +63,18 @@ fi
 # Проверяем права на выполнение
 chmod +x main.py
 
+# Создаем systemd сервис с правильными путями
+echo "🔧 Создаем systemd сервис..."
+if [ -f "create_service.sh" ]; then
+    chmod +x create_service.sh
+    ./create_service.sh
+else
+    echo "❌ Файл create_service.sh не найден!"
+    exit 1
+fi
+
 # Копируем systemd сервис
-echo "🔧 Настраиваем systemd сервис..."
+echo "🔧 Копируем systemd сервис..."
 cp systemd/vpnbot.service /etc/systemd/system/
 
 # Перезагружаем systemd
